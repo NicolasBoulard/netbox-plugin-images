@@ -21,7 +21,7 @@ cleanup() {
 trap cleanup EXIT
 
 echo "Starting $NETBOX_IMAGE with $PLUGIN_MODULE"
-"${compose[@]}" up --detach --wait --wait-timeout 600
+"${compose[@]}" up --detach --wait --wait-timeout 1000
 
 manage() { "${compose[@]}" exec -T netbox /opt/netbox/venv/bin/python /opt/netbox/netbox/manage.py "$@"; }
 
