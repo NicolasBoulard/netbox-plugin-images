@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   lint:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -28,7 +28,7 @@ jobs:
         run: scripts/plugin.sh conftest verify
 
   docs:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -44,7 +44,7 @@ jobs:
           npm run docs:build
 
   changes:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     outputs:
       plugins: ${{ steps.changed.outputs.plugins }}
     steps:
@@ -64,7 +64,7 @@ jobs:
   plugin:
     needs: changes
     if: needs.changes.outputs.plugins != '[]'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     strategy:
       fail-fast: false
       matrix:
@@ -102,7 +102,7 @@ jobs:
   ci-ok:
     if: always()
     needs: [lint, docs, changes, plugin]
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - name: All jobs passed
         env:

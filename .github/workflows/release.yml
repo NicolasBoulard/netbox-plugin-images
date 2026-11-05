@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   plan:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     outputs:
       releases: ${{ steps.plan.outputs.releases }}
     steps:
@@ -35,7 +35,7 @@ jobs:
   release:
     needs: plan
     if: needs.plan.outputs.releases != '[]'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: write
       packages: write
