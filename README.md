@@ -19,7 +19,7 @@
 <p align="center">
   <a href="https://nicolasboulard.github.io/netbox-plugin-images/usage"><b>Get started</b></a> ·
   <a href="https://nicolasboulard.github.io/netbox-plugin-images/catalog"><b>Browse plugins</b></a> ·
-  <a href="CONTRIBUTING.md">Contributing</a>
+  <a href="CONTRIBUTING.md"><b>Contributing</b></a>
 </p>
 
 ```
