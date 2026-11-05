@@ -55,7 +55,7 @@ the root `Dockerfile`, ships with the plugin's next version.
 - Commits follow [Conventional Commits](https://www.conventionalcommits.org/): `type(scope): description`.
 - Keep comments short and about *why*.
 - `make lint` runs CI's lint job with the same pinned tools, in Docker: the policy's format
-  (`scripts/plugin.sh conftest fmt policy` fixes it), shellcheck, actionlint and editorconfig.
+  (`scripts/plugin.sh conftest fmt policy` fixes it), shellcheck and editorconfig.
 - `make unit` runs the license policy's tests (`policy/plugin_test.rego`, with Conftest).
 - `.github/actions/plugin` builds, checks and tests one plugin; CI and the release workflow both
   run it, so a release goes through the checks its pull request passed.

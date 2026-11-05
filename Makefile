@@ -20,7 +20,7 @@ check: build
 test: check
 	integration/test.sh $(PLUGIN) build/$(PLUGIN)
 
-# Policy format, shellcheck, actionlint and editorconfig, with CI's pinned tools.
+# Policy format, shellcheck and editorconfig, with CI's pinned tools.
 lint:
 	scripts/lint.sh
 
