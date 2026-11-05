@@ -1,0 +1,19 @@
+# PyPI distribution of the plugin and its exact version: the version is the image's. Keep these two
+# lines together, in this order: Renovate reads them as a pair.
+name = "netbox-qrcode"
+version = "1.0.0"
+# Entry to add to NetBox's PLUGINS.
+module = "netbox_qrcode"
+homepage = "https://github.com/netbox-community/netbox-qrcode"
+
+# Runtime dependencies NetBox does not ship (anything also in NetBox's venv would shadow it), by
+# name only: each comes in its latest version when the plugin was released.
+dependencies = ["qrcode"]
+
+# NetBox release the image is tested against; the plugin's minor version tracks NetBox's.
+netbox = "v4.7.4"
+
+# SPDX license of every package, reviewed by a human: a change upstream fails the build.
+[licenses]
+netbox-qrcode = "Apache-2.0"
+qrcode = "BSD-3-Clause AND MIT"

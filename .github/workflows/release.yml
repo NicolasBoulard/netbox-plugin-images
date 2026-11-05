@@ -1,0 +1,114 @@
+name: Release
+
+# Every plugin version not released yet gets one, once: tag <plugin>/<version>,
+# image ghcr.io/<owner>/netbox-plugin-images/<plugin>:<version>. Running it by hand retries a failed run.
+on:
+  push:
+    branches: [main]
+    paths: [plugins/**]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Queued, never canceled: a canceled run could leave an image pushed without its release.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    outputs:
+      releases: ${{ steps.plan.outputs.releases }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - id: plan
+        run: |
+          releases=$(scripts/plugin.sh plan)
+          echo "releases=$releases" >> "$GITHUB_OUTPUT"
+          jq . <<< "$releases"
+
+  release:
+    needs: plan
+    if: needs.plan.outputs.releases != '[]'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+      attestations: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.plan.outputs.releases) }}
+    name: ${{ matrix.tag }}
+    env:
+      PLUGIN: ${{ matrix.plugin }}
+      TAG: ${{ matrix.tag }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Image name
+        id: image
+        run: echo "name=ghcr.io/${GITHUB_REPOSITORY,,}/$PLUGIN" >> "$GITHUB_OUTPUT"
+      # Build, licenses and wheels, NetBox integration test: the checks CI ran, again on main.
+      - id: plugin
+        uses: ./.github/actions/plugin
+        with:
+          plugin: ${{ matrix.plugin }}
+      - uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      # The image description is the plugin's own summary on PyPI.
+      - name: Push
+        id: push
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          build-args: |
+            PLUGIN=${{ matrix.name }}
+            VERSION=${{ matrix.version }}
+            DEPENDENCIES=${{ matrix.dependencies }}
+            NETBOX_IMAGE=${{ matrix.netbox_image }}
+          platforms: linux/amd64,linux/arm64
+          push: true
+          sbom: true
+          provenance: mode=max
+          # Never moves: a plugin version is built once.
+          tags: ${{ steps.image.outputs.name }}:${{ matrix.version }}
+          labels: |
+            org.opencontainers.image.title=${{ matrix.plugin }}
+            org.opencontainers.image.description=${{ steps.plugin.outputs.description }}
+            org.opencontainers.image.version=${{ matrix.version }}
+            org.opencontainers.image.licenses=${{ matrix.license }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.url=${{ matrix.homepage }}
+            io.github.nicolasboulard.netbox-plugin-images.module=${{ matrix.module }}
+            io.github.nicolasboulard.netbox-plugin-images.netbox=${{ matrix.netbox_minor }}
+          # GHCR shows the index annotations of multi-platform images.
+          annotations: |
+            index:org.opencontainers.image.description=${{ steps.plugin.outputs.description }}
+            index:org.opencontainers.image.licenses=${{ matrix.license }}
+            index:org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-name: ${{ steps.image.outputs.name }}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
+      - name: GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          IMAGE: ${{ steps.image.outputs.name }}
+          DIGEST: ${{ steps.push.outputs.digest }}
+        run: |
+          scripts/plugin.sh notes "$PLUGIN" "$TAG" "$IMAGE" "$DIGEST" "build/$PLUGIN" "$GITHUB_REPOSITORY" > notes.md
+          gh release create "$TAG" --target "$GITHUB_SHA" --title "$PLUGIN ${TAG#*/}" --notes-file notes.md

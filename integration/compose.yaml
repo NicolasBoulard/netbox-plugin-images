@@ -1,0 +1,48 @@
+# NetBox with one plugin mounted read-only, the way an image volume is (integration/test.sh).
+name: netbox-plugin-test
+
+services:
+  netbox:
+    image: ${NETBOX_IMAGE:?}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    environment:
+      DB_HOST: postgres
+      DB_NAME: netbox
+      DB_USER: netbox
+      DB_PASSWORD: netbox
+      REDIS_HOST: valkey
+      REDIS_CACHE_HOST: valkey
+      SECRET_KEY: integration-test-only-0123456789abcdefghijklmnopqrstuvwxyz
+      SKIP_SUPERUSER: "true"
+      PYTHONPATH: /opt/netbox/plugins/plugin
+      PLUGIN_MODULE: ${PLUGIN_MODULE:?}
+    volumes:
+      - ${PLUGIN_CONTENT:?}:/opt/netbox/plugins/plugin:ro
+      - ./plugins.py:/etc/netbox/config/plugins.py:ro
+    ports:
+      - 127.0.0.1:${NETBOX_PORT:-8080}:8080
+    healthcheck:
+      test: /opt/netbox/health.sh
+      start_period: 300s
+      start_interval: 5s
+      interval: 30s
+
+  postgres:
+    image: postgres:18.6-alpine@sha256:10a5c69a83035ab5239f5620d708520e8b28f5aa1f2b20143e6024532edadfb5
+    environment:
+      POSTGRES_DB: netbox
+      POSTGRES_USER: netbox
+      POSTGRES_PASSWORD: netbox
+    healthcheck:
+      test: pg_isready -q -d netbox -U netbox
+      interval: 2s
+
+  valkey:
+    image: valkey/valkey:9.1.3-alpine@sha256:bf09d58e96d6b4524a15396b65b242bbe18beebbcc15a04d8ee75ddac62fae0b
+    healthcheck:
+      test: valkey-cli ping
+      interval: 2s

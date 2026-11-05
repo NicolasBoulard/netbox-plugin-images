@@ -1,0 +1,14 @@
+{
+  "name": "netbox-plugin-images-docs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
+  },
+  "devDependencies": {
+    "smol-toml": "1.9.1",
+    "vitepress": "1.6.4"
+  }
+}

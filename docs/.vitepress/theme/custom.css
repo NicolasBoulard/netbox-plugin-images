@@ -1,0 +1,14 @@
+/* Brand color of the logo instead of VitePress's default indigo. */
+:root {
+  --vp-c-brand-1: #0b6f64;
+  --vp-c-brand-2: #0f8b7d;
+  --vp-c-brand-3: #0f8b7d;
+  --vp-c-brand-soft: rgb(15 139 125 / 14%);
+}
+
+.dark {
+  --vp-c-brand-1: #6ad8ca;
+  --vp-c-brand-2: #3cc7b5;
+  --vp-c-brand-3: #0f8b7d;
+  --vp-c-brand-soft: rgb(60 199 181 / 16%);
+}

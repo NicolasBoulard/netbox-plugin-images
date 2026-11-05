@@ -1,0 +1,114 @@
+name: CI
+
+# On main too, for the README badge: the status of the merged code, not only of the pull requests.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # Same script and pinned tools as make lint.
+      - name: Lint
+        run: scripts/lint.sh
+      - name: Policy tests
+        run: scripts/plugin.sh conftest verify
+
+  docs:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - name: Build
+        run: |
+          npm ci
+          npm run docs:build
+
+  changes:
+    runs-on: ubuntu-24.04
+    outputs:
+      plugins: ${{ steps.changed.outputs.plugins }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - id: changed
+        env:
+          # The pull request's base or the commit before the push; empty on a manual run, which
+          # checks every plugin.
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          plugins=$(scripts/plugin.sh changed "$BASE")
+          echo "plugins=$plugins" >> "$GITHUB_OUTPUT"
+
+  plugin:
+    needs: changes
+    if: needs.changes.outputs.plugins != '[]'
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.changes.outputs.plugins) }}
+    name: ${{ matrix.plugin }}
+    env:
+      PLUGIN: ${{ matrix.plugin }}
+      VERSION: ${{ matrix.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # Build, licenses and wheels, NetBox integration test: the steps a release runs.
+      - uses: ./.github/actions/plugin
+        with:
+          plugin: ${{ matrix.plugin }}
+      # The release notes this content would get, in the job summary: a broken template fails here,
+      # not after the image is pushed.
+      - name: Release notes preview
+        run: |
+          scripts/plugin.sh notes "$PLUGIN" "$PLUGIN/$VERSION" "ghcr.io/${GITHUB_REPOSITORY,,}/$PLUGIN" \
+            sha256:not-pushed "build/$PLUGIN" "$GITHUB_REPOSITORY" >> "$GITHUB_STEP_SUMMARY"
+      - name: Build every platform
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          build-args: |
+            PLUGIN=${{ matrix.name }}
+            VERSION=${{ matrix.version }}
+            DEPENDENCIES=${{ matrix.dependencies }}
+            NETBOX_IMAGE=${{ matrix.netbox_image }}
+          platforms: linux/amd64,linux/arm64
+
+  # Single required check for branch protection and Renovate automerge.
+  ci-ok:
+    if: always()
+    needs: [lint, docs, changes, plugin]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: All jobs passed
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "$RESULTS"
+          for r in $RESULTS; do
+            case $r in success|skipped) ;; *) exit 1 ;; esac
+          done

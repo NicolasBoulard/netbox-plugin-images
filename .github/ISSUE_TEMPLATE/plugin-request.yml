@@ -1,0 +1,28 @@
+name: Plugin request
+description: Ask for a NetBox plugin to be packaged.
+title: "Package <plugin name>"
+labels: [plugin-request]
+body:
+  - type: input
+    id: pypi
+    attributes:
+      label: PyPI package
+      placeholder: https://pypi.org/project/netbox-plugin-example/
+    validations:
+      required: true
+  - type: input
+    id: netbox
+    attributes:
+      label: NetBox version you run
+      placeholder: "4.7"
+    validations:
+      required: true
+  - type: checkboxes
+    id: requirements
+    attributes:
+      label: Requirements (CONTRIBUTING.md)
+      options:
+        - label: The plugin publishes a pure-Python wheel (py3-none-any) on PyPI.
+          required: true
+        - label: The plugin and its dependencies use OSI-approved licenses.
+          required: true

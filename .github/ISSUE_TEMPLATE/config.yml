@@ -1,0 +1,4 @@
+contact_links:
+  - name: Report a vulnerability
+    url: https://github.com/NicolasBoulard/netbox-plugin-images/security/advisories/new
+    about: Privately, not in a public issue (SECURITY.md).

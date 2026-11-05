@@ -1,0 +1,20 @@
+# PyPI distribution of the plugin and its exact version: the version is the image's. Keep these two
+# lines together, in this order: Renovate reads them as a pair.
+name = "netbox-plugin-dns"
+version = "1.7.3"
+# Entry to add to NetBox's PLUGINS.
+module = "netbox_dns"
+homepage = "https://github.com/sys4/netbox-plugin-dns"
+
+# Runtime dependencies NetBox does not ship (anything also in NetBox's venv would shadow it), by
+# name only: each comes in its latest version when the plugin was released.
+dependencies = ["dnspython"]
+
+# NetBox release the image is built with (its Python) and tested against; the plugin's minor version
+# tracks NetBox's.
+netbox = "v4.7.4"
+
+# SPDX license of every package, reviewed by a human: a change upstream fails the build.
+[licenses]
+netbox-plugin-dns = "MIT"
+dnspython = "ISC"

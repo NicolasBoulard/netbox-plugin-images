@@ -1,0 +1,6 @@
+{
+  "Exclude": ["__pycache__/", "^build/", "node_modules/", "^docs/\\.vitepress/(dist|cache)/", "^package-lock\\.json$"],
+  "Disable": {
+    "IndentSize": true
+  }
+}

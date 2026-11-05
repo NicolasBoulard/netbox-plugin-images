@@ -1,0 +1,47 @@
+name: Bug report
+description: A published image that does not load or work in NetBox.
+title: "<plugin>: <what goes wrong>"
+labels: [bug]
+body:
+  - type: input
+    id: image
+    attributes:
+      label: Image
+      description: The full reference, ideally with its digest.
+      placeholder: ghcr.io/nicolasboulard/netbox-plugin-images/netbox-plugin-dns:1.7.3@sha256:…
+    validations:
+      required: true
+  - type: input
+    id: netbox
+    attributes:
+      label: NetBox image
+      placeholder: ghcr.io/netbox-community/netbox:v4.7.4
+    validations:
+      required: true
+  - type: input
+    id: deployment
+    attributes:
+      label: How it is mounted
+      description: Helm chart (and its version), plain Kubernetes (and its version) or a Dockerfile.
+      placeholder: netbox-community/netbox-chart 7.x on Kubernetes 1.36
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you expected and what you got.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: NetBox logs
+      render: text
+  - type: checkboxes
+    id: upstream
+    attributes:
+      label: Upstream
+      options:
+        - label: The same plugin version, installed with pip in NetBox, works. Otherwise the bug belongs to the plugin's project.
+          required: false

@@ -1,0 +1,112 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard",
+    ":semanticCommits",
+    "docker:pinDigests",
+    "helpers:pinGitHubActionDigests"
+  ],
+  "labels": [
+    "dependencies"
+  ],
+  "minimumReleaseAge": "3 days",
+  "internalChecksFilter": "strict",
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "The plugin itself",
+      "managerFilePatterns": [
+        "/^plugins/[^/]+/plugin\\.toml$/"
+      ],
+      "matchStrings": [
+        "(?:^|\\n)name = \"(?<depName>[^\"]+)\"\\s*\\nversion = \"(?<currentValue>[^\"]+)\""
+      ],
+      "datasourceTemplate": "pypi",
+      "depTypeTemplate": "plugin"
+    },
+    {
+      "customType": "regex",
+      "description": "NetBox release the plugin is tested against",
+      "managerFilePatterns": [
+        "/^plugins/[^/]+/plugin\\.toml$/"
+      ],
+      "matchStrings": [
+        "\\nnetbox = \"(?<currentValue>[^\"]+)\""
+      ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "ghcr.io/netbox-community/netbox",
+      "versioningTemplate": "regex:^v(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$",
+      "depTypeTemplate": "netbox"
+    },
+    {
+      "customType": "regex",
+      "description": "Tooling images pinned after a `# renovate:` comment in scripts",
+      "managerFilePatterns": [
+        "/^scripts/[^/]+\\.sh$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\n[^\\n=]*=(?<currentValue>[^@\\s]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?"
+      ]
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "One PR per plugin; merged once CI (build, licenses, NetBox integration test) passes",
+      "matchFileNames": [
+        "plugins/**"
+      ],
+      "groupName": "{{parentDir}}",
+      "semanticCommitType": "feat",
+      "semanticCommitScope": "{{parentDir}}",
+      "automerge": true
+    },
+    {
+      "description": "Plugin minors follow NetBox minors: both move in one PR, merged once CI passes",
+      "matchFileNames": [
+        "plugins/**"
+      ],
+      "matchDepTypes": [
+        "plugin",
+        "netbox"
+      ],
+      "matchUpdateTypes": [
+        "major",
+        "minor"
+      ],
+      "groupName": "{{parentDir}} (NetBox upgrade)",
+      "automerge": true
+    },
+    {
+      "description": "plugin.toml keeps the NetBox tag only: it is a build and test target, not a deployment",
+      "matchDepTypes": [
+        "netbox"
+      ],
+      "pinDigests": false
+    },
+    {
+      "description": "Build, test and docs tooling: no release, merged once CI passes",
+      "matchManagers": [
+        "dockerfile",
+        "docker-compose",
+        "github-actions",
+        "npm",
+        "nodenv"
+      ],
+      "groupName": "build tooling",
+      "semanticCommitType": "ci",
+      "semanticCommitScope": "deps",
+      "automerge": true
+    },
+    {
+      "description": "Tooling images pinned in scripts (conftest, linters) go with the rest of the tooling",
+      "matchFileNames": [
+        "scripts/**"
+      ],
+      "groupName": "build tooling",
+      "semanticCommitType": "ci",
+      "semanticCommitScope": "deps",
+      "automerge": true
+    }
+  ]
+}
