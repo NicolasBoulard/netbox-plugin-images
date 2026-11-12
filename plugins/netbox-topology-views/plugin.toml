@@ -1,7 +1,7 @@
 # PyPI distribution of the plugin and its exact version: the version is the image's. Keep these two
 # lines together, in this order: Renovate reads them as a pair.
 name = "netbox-topology-views"
-version = "5.0.1"
+version = "5.0.2"
 # Entry to add to NetBox's PLUGINS.
 module = "netbox_topology_views"
 homepage = "https://github.com/mattieserver/netbox-topology-views"
