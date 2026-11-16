@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#062b27"/>
+      <stop offset="1" stop-color="#0b4f47"/>
+    </linearGradient>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0H0V32" fill="none" stroke="#ffffff" stroke-opacity=".04"/>
+    </pattern>
+    <radialGradient id="glow" cx=".78" cy=".55" r=".5">
+      <stop offset="0" stop-color="#3cc7b5" stop-opacity=".22"/>
+      <stop offset="1" stop-color="#3cc7b5" stop-opacity="0"/>
+    </radialGradient>
+    <!-- The repository logo (docs/public/favicon.svg). -->
+    <symbol id="logo" viewBox="0 0 32 32">
+      <rect width="32" height="32" rx="8" fill="#0f8b7d"/>
+      <path d="M5.5 10H16.5V27.25L16 27.5 5.5 22.25Z" fill="#e3f5f2"/>
+      <path d="M16 10H26.5V22.25L16 27.5Z" fill="#a9e3da"/>
+      <path d="M16 4.75 26.5 10 16 15.25 5.5 10Z" fill="#fff"/>
+      <path d="M4 12.625 16 18.625 28 12.625V14.075L16 20.075 4 14.075ZM4 16.725 16 22.725 28 16.725V18.175L16 24.175 4 18.175Z" fill="#0f8b7d"/>
+    </symbol>
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0 10 5 0 10Z" fill="#6ad8ca"/>
+    </marker>
+    <style>
+      .sans { font-family: -apple-system, "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif; }
+      .mono { font-family: "SF Mono", Menlo, Consolas, monospace; }
+      .chip rect { fill: #ffffff; fill-opacity: .06; stroke: #6ad8ca; stroke-opacity: .35; }
+      .chip text { fill: #e3f5f2; font-size: 16px; }
+    </style>
+  </defs>
+
+  <rect width="1280" height="640" fill="url(#bg)"/>
+  <rect width="1280" height="640" fill="url(#grid)"/>
+  <rect width="1280" height="640" fill="url(#glow)"/>
+
+  <!-- Left: identity -->
+  <use href="#logo" x="80" y="92" width="104" height="104"/>
+  <text class="sans" x="80" y="282" fill="#ffffff" font-size="62" font-weight="800" letter-spacing="-1.5">NetBox Plugin</text>
+  <text class="sans" x="80" y="352" fill="#ffffff" font-size="62" font-weight="800" letter-spacing="-1.5">Images</text>
+  <text class="sans" x="80" y="414" fill="#6ad8ca" font-size="34" font-weight="600">Plugins mounted, not built in.</text>
+  <text class="sans" x="80" y="462" fill="#a9e3da" fill-opacity=".85" font-size="21">One OCI image per plugin, mounted into</text>
+  <text class="sans" x="80" y="490" fill="#a9e3da" fill-opacity=".85" font-size="21">official NetBox as a Kubernetes image volume.</text>
+
+  <g class="sans" font-size="16" font-weight="600">
+    <rect x="80" y="528" width="176" height="36" rx="18" fill="#3cc7b5" fill-opacity=".16" stroke="#3cc7b5" stroke-opacity=".5"/>
+    <text x="168" y="551" text-anchor="middle" fill="#6ad8ca">Kubernetes native</text>
+    <rect x="268" y="528" width="128" height="36" rx="18" fill="#3cc7b5" fill-opacity=".16" stroke="#3cc7b5" stroke-opacity=".5"/>
+    <text x="332" y="551" text-anchor="middle" fill="#6ad8ca">Apache-2.0</text>
+  </g>
+
+  <!-- Right: plugin images -->
+  <g class="mono">
+    <g class="chip"><rect x="700" y="84" width="232" height="46" rx="10"/><use href="#logo" x="712" y="95" width="24" height="24"/><text x="746" y="113">netbox-bgp</text></g>
+    <g class="chip"><rect x="944" y="84" width="256" height="46" rx="10"/><use href="#logo" x="956" y="95" width="24" height="24"/><text x="990" y="113">netbox-plugin-dns</text></g>
+    <g class="chip"><rect x="700" y="142" width="232" height="46" rx="10"/><use href="#logo" x="712" y="153" width="24" height="24"/><text x="746" y="171">netbox-inventory</text></g>
+    <g class="chip"><rect x="944" y="142" width="256" height="46" rx="10"/><use href="#logo" x="956" y="153" width="24" height="24"/><text x="990" y="171">netbox-topology-views</text></g>
+    <g class="chip"><rect x="700" y="200" width="232" height="46" rx="10"/><use href="#logo" x="712" y="211" width="24" height="24"/><text x="746" y="229">netbox-acls</text></g>
+    <g class="chip"><rect x="944" y="200" width="256" height="46" rx="10" stroke-dasharray="5 5"/><text x="1072" y="229" text-anchor="middle" fill-opacity=".75">+ more</text></g>
+  </g>
+
+  <!-- Mount arrows -->
+  <g stroke="#6ad8ca" stroke-width="2.5" stroke-dasharray="6 6" fill="none" marker-end="url(#arrow)">
+    <path d="M818 256V318"/>
+    <path d="M950 256V318"/>
+    <path d="M1082 256V318"/>
+  </g>
+  <rect x="876" y="272" width="148" height="28" rx="6" fill="#062b27"/>
+  <text class="mono" x="950" y="291" text-anchor="middle" fill="#6ad8ca" font-size="14" font-weight="600">image volume</text>
+
+  <!-- Pod -->
+  <rect x="700" y="330" width="500" height="234" rx="16" fill="#ffffff" fill-opacity=".04" stroke="#a9e3da" stroke-opacity=".45" stroke-width="1.5" stroke-dasharray="8 6"/>
+  <text class="sans" x="722" y="362" fill="#a9e3da" fill-opacity=".8" font-size="14" font-weight="700" letter-spacing="2">POD</text>
+
+  <rect x="722" y="378" width="456" height="164" rx="12" fill="#e3f5f2"/>
+  <text class="sans" x="744" y="414" fill="#062b27" font-size="22" font-weight="800">netbox</text>
+  <text class="mono" x="744" y="440" fill="#0b6f64" font-size="14">ghcr.io/netbox-community/netbox</text>
+  <rect x="1046" y="396" width="114" height="26" rx="13" fill="#0f8b7d"/>
+  <text class="sans" x="1103" y="414" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="700">UNMODIFIED</text>
+
+  <text class="mono" x="744" y="476" fill="#062b27" fill-opacity=".7" font-size="14">/opt/netbox/plugins/</text>
+  <g>
+    <use href="#logo" x="744" y="490" width="34" height="34"/>
+    <use href="#logo" x="786" y="490" width="34" height="34"/>
+    <use href="#logo" x="828" y="490" width="34" height="34"/>
+    <use href="#logo" x="870" y="490" width="34" height="34"/>
+    <use href="#logo" x="912" y="490" width="34" height="34"/>
+    <rect x="954" y="490" width="34" height="34" rx="8" fill="none" stroke="#0f8b7d" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <text class="sans" x="971" y="512" text-anchor="middle" fill="#0b6f64" font-size="13" font-weight="700">…</text>
+  </g>
+
+  <!-- Footer -->
+  <text class="mono" x="1200" y="606" text-anchor="end" fill="#a9e3da" fill-opacity=".6" font-size="15">github.com/NicolasBoulard/netbox-plugin-images</text>
+</svg>
