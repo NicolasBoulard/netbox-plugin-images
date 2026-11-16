@@ -1,7 +1,7 @@
 # PyPI distribution of the plugin and its exact version: the version is the image's. Keep these two
 # lines together, in this order: Renovate reads them as a pair.
 name = "netbox-contract"
-version = "2.6.0"
+version = "2.6.1"
 # Entry to add to NetBox's PLUGINS.
 module = "netbox_contract"
 homepage = "https://github.com/mlebreuil/netbox-contract"
